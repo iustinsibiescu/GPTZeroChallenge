@@ -1,0 +1,20 @@
+header{
+    display: block;
+    font-size:larger;
+    font-weight: bold;
+}
+
+subheader{
+    display: block;
+    font-size: large;
+}
+
+subheader {
+    display: block;
+    font-size: medium;
+    padding: 10px;
+  }
+
+subheader:before {
+    content: "• ";
+}

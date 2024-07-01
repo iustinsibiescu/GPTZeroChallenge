@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { getPromptResponseThroughWS } from "../../api/getPromptResponseThroughWS";
 import { ChatResponse, ChatPrompt, TextArea } from "../components/chat";
+import './styles.css';
 
 const agentTypes = {
   user: "User",

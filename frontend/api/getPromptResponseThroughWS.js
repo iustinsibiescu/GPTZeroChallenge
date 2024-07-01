@@ -1,4 +1,3 @@
-import axios from "axios";
 import { backendStreamingUrl } from "./constants";
 
 export const getPromptResponseThroughWS = async (prompt, onMessageCallback, onCloseConnectionCallback) => {
