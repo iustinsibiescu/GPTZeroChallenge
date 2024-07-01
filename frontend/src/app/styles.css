@@ -4,11 +4,6 @@ header{
     font-weight: bold;
 }
 
-subheader{
-    display: block;
-    font-size: large;
-}
-
 subheader {
     display: block;
     font-size: medium;
@@ -17,4 +12,9 @@ subheader {
 
 subheader:before {
     content: "• ";
+}
+
+bodyGPT {
+    display: block;
+    font-size: small;
 }

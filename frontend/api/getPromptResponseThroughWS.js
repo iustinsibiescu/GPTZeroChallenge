@@ -1,4 +1,5 @@
 import { backendStreamingUrl } from "./constants";
+import { cleanMessage } from "./cleanMessage";
 
 export const getPromptResponseThroughWS = async (prompt, onMessageCallback, onCloseConnectionCallback) => {
     const socket = new WebSocket(backendStreamingUrl);
@@ -10,8 +11,8 @@ export const getPromptResponseThroughWS = async (prompt, onMessageCallback, onCl
     });
 
     socket.addEventListener('message', function (event) {
-      console.log('Message from server ', event.data); 
-      response += event.data;
+      console.log('Message from server ', event.data);
+      response += cleanMessage(event.data);
       onMessageCallback(response);
     });
 
