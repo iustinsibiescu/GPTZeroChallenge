@@ -68,7 +68,7 @@ export default function Home() {
     setError(null);
 
     try {
-      const socket = new WebSocket('ws://localhost:8082/v1/stream');
+      const socket = new WebSocket('ws://localhost:8081/v1/stream');
       let response = '';
   
       // Event listener for when the connection is open
