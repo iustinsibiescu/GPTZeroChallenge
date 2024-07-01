@@ -22,16 +22,30 @@ app.post("/", async (req, res) => {
   res.send(responseHTML);
 });
 
-wsServer.on("connection", async (ws) => {
-  ws.on("message", async (prompt) => {
+wsServer.on("connection", async (wsClient) => {
+  wsClient.on("message", async (prompt) => {
     console.log("Received prompt: ", prompt);
-    const modelOutputGenerator = getModelResponseGenerator(prompt);
-    let result = await modelOutputGenerator.next();
-    while (!result.done) {
-      ws.send(result.value);
-      result = await modelOutputGenerator.next();
+    
+    try{
+      const wsForApi = new WebSocket('ws://localhost:8082/v1/stream');
+      wsForApi.onopen = () => {
+        console.log('Connected to the WebSocket server');
+        wsForApi.send(prompt);
+      };
+
+      wsForApi.onmessage = (event) => {
+        console.log('Received:', event.data);
+        wsClient.send(event.data);
+      };
+
+      wsForApi.onclose = () => {
+        console.log('Disconnected from the WebSocket server');
+        wsClient.close();
+      };
+    } catch(error){
+      console.log(error);
+      wsClient.close();
     }
-    ws.close();
   });
 });
 
@@ -50,17 +64,3 @@ server.on("upgrade", (request, socket, head) => {
 server.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
-
-
-const getModelResponseGenerator = async function* (prompt) {
-  try {
-    const choice = 'This is a test message that needs to be streamed word for word. This is a test message that needs to be streamed word for word This is a test message that needs to be streamed word for word This is a test message that needs to be streamed word for word This is a test message that needs to be streamed word for word This is a test message that needs to be streamed word for word This is a test message that needs to be streamed word for word This is a test message that needs to be streamed word for word This is a test message that needs to be streamed word for word This is a test message that needs to be streamed word for word This is a test message that needs to be streamed word for word';
-    const words = choice.split(" ");
-    for (let word of words) {
-      await new Promise((resolve) => setTimeout(resolve, 20));
-      yield word + " ";
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
