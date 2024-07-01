@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { getPromptResponse } from "../../api/getPromptResponse";
+import { getPromptResponseThroughWS } from "../../api/getPromptResponseThroughWS";
 import { ChatResponse, ChatPrompt, TextArea } from "../components/chat";
 
 const agentTypes = {
@@ -41,68 +41,27 @@ export default function Home() {
     );
   };
 
-  const handleSubmit = async () => {
+  const handleSubmitWS = async () => {
+    const onMessageCallback = function(message){
+      addMessage(message, agentTypes.richieRich, false);
+    }
+
+    const onCloseConnectionCallback = function(message){
+      setPrompt("");
+      setIsLoadingResponse(false);
+    }
+
     if (!prompt) {
       setError("Please enter a prompt.");
       return;
     }
+    
     setError(null);
     try {
       setIsLoadingResponse(true);
-      addMessage(prompt, agentTypes.user);
-      const response = await getPromptResponse(prompt);
-      addMessage(response, agentTypes.richieRich);
-      setPrompt("");
-      setIsLoadingResponse(false);
-    } catch (error) {
-      setError("An error occurred. Please try again.");
-      setIsLoadingResponse(false);
-    }
-  };
-
-  const handleSubmitWS = async () => {
-    if (!prompt) {
-      setError("Please enter a prompt.");
-      return;
-    }
-    setError(null);
-
-    try {
-      const socket = new WebSocket('ws://localhost:8081/v1/stream');
-      let response = '';
-  
-      // Event listener for when the connection is open
-      socket.addEventListener('open', function (event) {
-          setIsLoadingResponse(true);
-          // Post the user prompt
-          addMessage(prompt, agentTypes.user, true);
-          // Start the answer prompt 
-          addMessage(response, agentTypes.richieRich, true);
-          console.log('WebSocket is open now.');
-
-          // Send data to the server
-          socket.send(prompt);
-      });
-  
-      // Event listener for when a message is received from the server
-      socket.addEventListener('message', function (event) {
-          response += event.data;
-          // Update the gpt prompt
-          addMessage(response, agentTypes.richieRich, false);
-          console.log('Message from server ', event.data);
-      });
-  
-      // Event listener for when the connection is closed
-      socket.addEventListener('close', function (event) {
-          setPrompt("");
-          setIsLoadingResponse(false);
-          console.log('WebSocket is closed now.');
-      });
-  
-      // Event listener for when there is an error
-      socket.addEventListener('error', function (event) {
-          console.error('WebSocket error observed:', event);
-      });
+      addMessage(prompt, agentTypes.user, true);          
+      addMessage('', agentTypes.richieRich, true);
+      getPromptResponseThroughWS(prompt, onMessageCallback, onCloseConnectionCallback);
     } catch (error) {
       setError("An error occurred. Please try again.");
       setIsLoadingResponse(false);
