@@ -35,7 +35,7 @@ wsServer.on("connection", async (wsClient) => {
 
       wsForApi.onmessage = (event) => {
         console.log('Received:', event.data);
-        wsClient.send(event.data);
+        wsClient.send(RRML2HTML(event.data));
       };
 
       wsForApi.onclose = () => {
